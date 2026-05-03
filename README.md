@@ -122,6 +122,23 @@ mvn spring-boot:run
 java -jar target/camel-country-summary-1.0.0-SNAPSHOT.jar
 ```
 
+## Docker
+
+Build the image locally:
+
+```bash
+docker build -t camel-country-summary:local .
+```
+
+Run the container:
+
+```bash
+docker run -p 8080:8080 \
+  -e OPENWEATHERMAP_API_KEY=your-openweathermap-api-key \
+  -e EXCHANGERATE_API_KEY=your-exchangerate-api-key \
+  camel-country-summary:local
+```
+
 ## Usage
 
 ### Get Country Summary
@@ -209,3 +226,20 @@ The repository includes a GitHub Actions workflow that runs on every push and pu
 - Maven dependency cache
 - Java 17 setup
 - `mvn clean verify`
+- Docker image build with Buildx
+- GHCR push on `push`
+- Deployment manifest artifact upload
+
+## Deploy Preparation
+
+Deployment starter manifests are available in [deploy/k8s](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s):
+
+- [deployment.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/deployment.yaml:1)
+- [service.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/service.yaml:1)
+- [secret-example.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/secret-example.yaml:1)
+
+Before deploying:
+
+1. Replace `ghcr.io/OWNER/camel-country-summary:latest` with your real image path.
+2. Create the Kubernetes secret from your real API keys.
+3. Apply the manifests to your cluster.

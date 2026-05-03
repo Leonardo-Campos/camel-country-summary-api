@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: camel-country-summary
+  labels:
+    app: camel-country-summary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: camel-country-summary
+  template:
+    metadata:
+      labels:
+        app: camel-country-summary
+    spec:
+      containers:
+        - name: camel-country-summary
+          image: ghcr.io/OWNER/camel-country-summary:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: OPENWEATHERMAP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: camel-country-summary-secrets
+                  key: OPENWEATHERMAP_API_KEY
+            - name: EXCHANGERATE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: camel-country-summary-secrets
+                  key: EXCHANGERATE_API_KEY
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
