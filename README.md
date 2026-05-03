@@ -139,6 +139,15 @@ docker run -p 8080:8080 \
   camel-country-summary:local
 ```
 
+Run the full stack with Redis:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The application uses Redis as a cache for the final country summary response. If Redis is unavailable, the API still responds and simply skips cache read/write.
+
 ## Usage
 
 ### Get Country Summary

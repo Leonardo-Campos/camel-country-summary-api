@@ -3,6 +3,13 @@ server:
   servlet:
     context-path: /
 
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
 camel:
   springboot:
     name: camel-country-summary
@@ -43,3 +50,7 @@ logging:
     org.apache.camel.component.http: DEBUG
     org.apache.http: DEBUG
     com.leonardocampos: DEBUG
+
+cache:
+  redis:
+    ttl-minutes: ${REDIS_CACHE_TTL_MINUTES:30}

@@ -15,6 +15,7 @@ public final class RouteConstants {
     // Header names
     public static final String HEADER_COUNTRY_NAME = "countryName";
     public static final String HEADER_COUNTRY_SUMMARY = "countrySummary";
+    public static final String HEADER_CACHE_HIT = "cacheHit";
     public static final String HEADER_CURRENCY_CODE = "currencyCode";
     public static final String HEADER_LATITUDE = "latitude";
     public static final String HEADER_LONGITUDE = "longitude";
