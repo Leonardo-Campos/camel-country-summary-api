@@ -7,6 +7,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.stereotype.Component;
 
+import static com.leonardocampos.camelcountrysummary.config.RouteConstants.DATA_TYPE_WEATHER;
+import static com.leonardocampos.camelcountrysummary.config.RouteConstants.HEADER_DATA_TYPE;
+
 @Component
 public class WeatherResponseProcessor implements Processor {
 
@@ -36,7 +39,7 @@ public class WeatherResponseProcessor implements Processor {
             weather.setWindSpeed(wind.path("speed").asDouble());
         }
 
-        exchange.getIn().setHeader("dataType", "weather");
+        exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_WEATHER);
         exchange.getIn().setBody(weather);
     }
 }

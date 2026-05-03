@@ -7,6 +7,8 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.stereotype.Component;
 
+import static com.leonardocampos.camelcountrysummary.config.RouteConstants.*;
+
 @Component
 public class RestCountriesResponseProcessor implements Processor {
 
@@ -17,12 +19,7 @@ public class RestCountriesResponseProcessor implements Processor {
         String body = exchange.getIn().getBody(String.class);
         JsonNode root = objectMapper.readTree(body);
 
-        if (!root.isArray() || root.isEmpty()) {
-            exchange.getIn().setHeader("countryFound", false);
-            return;
-        }
-
-        JsonNode country = root.get(0);
+        JsonNode country = root.isArray() && !root.isEmpty() ? root.get(0) : root;
         CountrySummary summary = new CountrySummary();
 
         summary.setCountry(country.path("name").path("common").asText());
@@ -45,11 +42,9 @@ public class RestCountriesResponseProcessor implements Processor {
             summary.setLongitude(latlng.get(1).asDouble());
         }
 
-        exchange.getIn().setHeader("countryFound", true);
-        exchange.getIn().setHeader("capitalCity", summary.getCapital());
-        exchange.getIn().setHeader("currencyCode", summary.getCurrencyCode());
-        exchange.getIn().setHeader("latitude", summary.getLatitude());
-        exchange.getIn().setHeader("longitude", summary.getLongitude());
+        exchange.getIn().setHeader(HEADER_CURRENCY_CODE, summary.getCurrencyCode());
+        exchange.getIn().setHeader(HEADER_LATITUDE, summary.getLatitude());
+        exchange.getIn().setHeader(HEADER_LONGITUDE, summary.getLongitude());
         exchange.getIn().setBody(summary);
     }
 }

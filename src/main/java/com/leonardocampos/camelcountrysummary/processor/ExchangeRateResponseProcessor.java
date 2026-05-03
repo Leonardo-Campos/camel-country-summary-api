@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.leonardocampos.camelcountrysummary.config.RouteConstants.DATA_TYPE_EXCHANGE_RATE;
+import static com.leonardocampos.camelcountrysummary.config.RouteConstants.HEADER_DATA_TYPE;
+
 @Component
 public class ExchangeRateResponseProcessor implements Processor {
 
@@ -35,7 +38,7 @@ public class ExchangeRateResponseProcessor implements Processor {
             exchangeRate.setRates(rates);
         }
 
-        exchange.getIn().setHeader("dataType", "exchangeRate");
+        exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_EXCHANGE_RATE);
         exchange.getIn().setBody(exchangeRate);
     }
 }
