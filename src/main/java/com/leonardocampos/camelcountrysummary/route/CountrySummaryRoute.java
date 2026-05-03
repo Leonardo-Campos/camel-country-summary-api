@@ -139,6 +139,8 @@ public class CountrySummaryRoute extends RouteBuilder {
         // Route: Enrich with external data using Multicast (parallel)
         from("direct:enrichWithExternalData")
                 .routeId("enrich-external-data")
+                .process(exchange -> exchange.getIn().setHeader("countrySummary",
+                        exchange.getIn().getBody(CountrySummary.class)))
                 .multicast(aggregationStrategy)
                     .parallelProcessing()
                     .timeout(10000)

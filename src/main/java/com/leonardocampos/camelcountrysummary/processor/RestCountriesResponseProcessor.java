@@ -33,7 +33,7 @@ public class RestCountriesResponseProcessor implements Processor {
         }
 
         JsonNode currencies = country.path("currencies");
-        if (currencies.isObject()) {
+        if (currencies.isObject() && currencies.size() > 0) {
             String currencyCode = currencies.fieldNames().next();
             summary.setCurrencyCode(currencyCode);
             summary.setCurrency(currencies.path(currencyCode).path("name").asText());
