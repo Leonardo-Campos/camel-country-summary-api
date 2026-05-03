@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
+import com.leonardocampos.camelcountrysummary.processor.ExchangeRateFallbackProcessor;
 import com.leonardocampos.camelcountrysummary.processor.ExchangeRateResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -13,6 +13,7 @@ import static com.leonardocampos.camelcountrysummary.config.RouteConstants.*;
 public class ExchangeRateRoute extends RouteBuilder {
 
     private final ExchangeRateResponseProcessor exchangeRateProcessor;
+    private final ExchangeRateFallbackProcessor exchangeRateFallbackProcessor;
 
     @Value("${api.exchangerate.url:https://api.exchangerate.host}")
     private String exchangeRateUrl;
@@ -20,8 +21,10 @@ public class ExchangeRateRoute extends RouteBuilder {
     @Value("${api.exchangerate.key:}")
     private String exchangeRateApiKey;
 
-    public ExchangeRateRoute(ExchangeRateResponseProcessor exchangeRateProcessor) {
+    public ExchangeRateRoute(ExchangeRateResponseProcessor exchangeRateProcessor,
+                             ExchangeRateFallbackProcessor exchangeRateFallbackProcessor) {
         this.exchangeRateProcessor = exchangeRateProcessor;
+        this.exchangeRateFallbackProcessor = exchangeRateFallbackProcessor;
     }
 
     @Override
@@ -47,12 +50,7 @@ public class ExchangeRateRoute extends RouteBuilder {
                     .process(exchangeRateProcessor)
                 .onFallback()
                     .log("Circuit breaker fallback triggered for Exchange Rate API")
-                    .process(exchange -> {
-                        ExchangeRateInfo exchangeRate = new ExchangeRateInfo();
-                        exchangeRate.setError("Exchange rate data is temporarily unavailable");
-                        exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_EXCHANGE_RATE);
-                        exchange.getIn().setBody(exchangeRate);
-                    })
+                    .process(exchangeRateFallbackProcessor)
                 .end();
     }
 }

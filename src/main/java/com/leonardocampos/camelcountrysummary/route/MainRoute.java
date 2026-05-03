@@ -2,9 +2,8 @@ package com.leonardocampos.camelcountrysummary.route;
 
 import com.leonardocampos.camelcountrysummary.config.RouteConstants;
 import com.leonardocampos.camelcountrysummary.model.CountrySummary;
-import com.leonardocampos.camelcountrysummary.model.ErrorResponse;
 import com.leonardocampos.camelcountrysummary.processor.CountryNotFoundProcessor;
-import org.apache.camel.Exchange;
+import com.leonardocampos.camelcountrysummary.processor.GenericErrorProcessor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -15,9 +14,12 @@ import org.springframework.stereotype.Component;
 public class MainRoute extends RouteBuilder {
 
     private final CountryNotFoundProcessor countryNotFoundProcessor;
+    private final GenericErrorProcessor genericErrorProcessor;
 
-    public MainRoute(CountryNotFoundProcessor countryNotFoundProcessor) {
+    public MainRoute(CountryNotFoundProcessor countryNotFoundProcessor,
+                     GenericErrorProcessor genericErrorProcessor) {
         this.countryNotFoundProcessor = countryNotFoundProcessor;
+        this.genericErrorProcessor = genericErrorProcessor;
     }
 
     @Override
@@ -30,11 +32,7 @@ public class MainRoute extends RouteBuilder {
 
         onException(Exception.class)
                 .handled(true)
-                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(500))
-                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                .process(exchange -> exchange.getIn().setBody(
-                        new ErrorResponse(500, "Internal Server Error",
-                                "An unexpected error occurred while processing the request")))
+                .process(genericErrorProcessor)
                 .marshal().json();
 
         restConfiguration()

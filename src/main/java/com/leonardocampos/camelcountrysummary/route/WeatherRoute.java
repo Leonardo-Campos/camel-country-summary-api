@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
+import com.leonardocampos.camelcountrysummary.processor.WeatherFallbackProcessor;
 import com.leonardocampos.camelcountrysummary.processor.WeatherResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -13,6 +13,7 @@ import static com.leonardocampos.camelcountrysummary.config.RouteConstants.*;
 public class WeatherRoute extends RouteBuilder {
 
     private final WeatherResponseProcessor weatherProcessor;
+    private final WeatherFallbackProcessor weatherFallbackProcessor;
 
     @Value("${api.openweathermap.key:}")
     private String weatherApiKey;
@@ -20,8 +21,10 @@ public class WeatherRoute extends RouteBuilder {
     @Value("${api.openweathermap.url:https://api.openweathermap.org/data/2.5}")
     private String weatherApiUrl;
 
-    public WeatherRoute(WeatherResponseProcessor weatherProcessor) {
+    public WeatherRoute(WeatherResponseProcessor weatherProcessor,
+                        WeatherFallbackProcessor weatherFallbackProcessor) {
         this.weatherProcessor = weatherProcessor;
+        this.weatherFallbackProcessor = weatherFallbackProcessor;
     }
 
     @Override
@@ -48,12 +51,7 @@ public class WeatherRoute extends RouteBuilder {
                     .process(weatherProcessor)
                 .onFallback()
                     .log("Circuit breaker fallback triggered for Weather API")
-                    .process(exchange -> {
-                        WeatherInfo weather = new WeatherInfo();
-                        weather.setError("Weather data is temporarily unavailable");
-                        exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_WEATHER);
-                        exchange.getIn().setBody(weather);
-                    })
+                    .process(weatherFallbackProcessor)
                 .end();
     }
 }
