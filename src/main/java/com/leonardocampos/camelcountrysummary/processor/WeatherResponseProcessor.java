@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.processor;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
 import com.leonardocampos.camelcountrysummary.service.WeatherService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -21,7 +21,7 @@ public class WeatherResponseProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String body = exchange.getIn().getBody(String.class);
-        CountrySummary.WeatherInfo weather = weatherService.parseResponse(body);
+        WeatherInfo weather = weatherService.parseResponse(body);
 
         exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_WEATHER);
         exchange.getIn().setBody(weather);

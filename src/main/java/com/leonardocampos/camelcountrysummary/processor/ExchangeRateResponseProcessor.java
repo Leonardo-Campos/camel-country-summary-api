@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.processor;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
 import com.leonardocampos.camelcountrysummary.service.ExchangeRateService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -21,7 +21,7 @@ public class ExchangeRateResponseProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         String body = exchange.getIn().getBody(String.class);
-        CountrySummary.ExchangeRateInfo exchangeRate = exchangeRateService.parseResponse(body);
+        ExchangeRateInfo exchangeRate = exchangeRateService.parseResponse(body);
 
         exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_EXCHANGE_RATE);
         exchange.getIn().setBody(exchangeRate);

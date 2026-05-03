@@ -1,6 +1,8 @@
 package com.leonardocampos.camelcountrysummary.strategy;
 
 import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
+import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
@@ -41,9 +43,9 @@ public class CountrySummaryAggregationStrategy implements AggregationStrategy {
         String dataType = exchange.getIn().getHeader(HEADER_DATA_TYPE, String.class);
         Object body = exchange.getIn().getBody();
 
-        if (DATA_TYPE_WEATHER.equals(dataType) && body instanceof CountrySummary.WeatherInfo weatherInfo) {
+        if (DATA_TYPE_WEATHER.equals(dataType) && body instanceof WeatherInfo weatherInfo) {
             summary.setWeather(weatherInfo);
-        } else if (DATA_TYPE_EXCHANGE_RATE.equals(dataType) && body instanceof CountrySummary.ExchangeRateInfo exchangeRateInfo) {
+        } else if (DATA_TYPE_EXCHANGE_RATE.equals(dataType) && body instanceof ExchangeRateInfo exchangeRateInfo) {
             summary.setExchangeRate(exchangeRateInfo);
         }
     }

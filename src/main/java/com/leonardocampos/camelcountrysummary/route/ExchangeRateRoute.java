@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
 import com.leonardocampos.camelcountrysummary.processor.ExchangeRateResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -48,7 +48,7 @@ public class ExchangeRateRoute extends RouteBuilder {
                 .onFallback()
                     .log("Circuit breaker fallback triggered for Exchange Rate API")
                     .process(exchange -> {
-                        CountrySummary.ExchangeRateInfo exchangeRate = new CountrySummary.ExchangeRateInfo();
+                        ExchangeRateInfo exchangeRate = new ExchangeRateInfo();
                         exchangeRate.setError("Exchange rate data is temporarily unavailable");
                         exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_EXCHANGE_RATE);
                         exchange.getIn().setBody(exchangeRate);

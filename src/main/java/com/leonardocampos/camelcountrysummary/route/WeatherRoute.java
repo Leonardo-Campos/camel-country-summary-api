@@ -1,6 +1,6 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
 import com.leonardocampos.camelcountrysummary.processor.WeatherResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -49,7 +49,7 @@ public class WeatherRoute extends RouteBuilder {
                 .onFallback()
                     .log("Circuit breaker fallback triggered for Weather API")
                     .process(exchange -> {
-                        CountrySummary.WeatherInfo weather = new CountrySummary.WeatherInfo();
+                        WeatherInfo weather = new WeatherInfo();
                         weather.setError("Weather data is temporarily unavailable");
                         exchange.getIn().setHeader(HEADER_DATA_TYPE, DATA_TYPE_WEATHER);
                         exchange.getIn().setBody(weather);

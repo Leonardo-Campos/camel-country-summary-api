@@ -1,7 +1,7 @@
 package com.leonardocampos.camelcountrysummary.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
 import com.leonardocampos.camelcountrysummary.model.api.WeatherApiResponse;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +14,13 @@ public class WeatherService {
         this.objectMapper = objectMapper;
     }
 
-    public CountrySummary.WeatherInfo parseResponse(String json) throws Exception {
+    public WeatherInfo parseResponse(String json) throws Exception {
         WeatherApiResponse response = objectMapper.readValue(json, WeatherApiResponse.class);
         return mapToWeatherInfo(response);
     }
 
-    private CountrySummary.WeatherInfo mapToWeatherInfo(WeatherApiResponse response) {
-        CountrySummary.WeatherInfo weather = new CountrySummary.WeatherInfo();
+    private WeatherInfo mapToWeatherInfo(WeatherApiResponse response) {
+        WeatherInfo weather = new WeatherInfo();
 
         if (response.getWeather() != null && !response.getWeather().isEmpty()) {
             weather.setDescription(response.getWeather().get(0).getDescription());

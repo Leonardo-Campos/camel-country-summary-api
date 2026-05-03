@@ -8,16 +8,16 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestCountryResponse {
 
-    private Name name;
+    private CountryName name;
     private List<String> capital;
     private Map<String, CurrencyInfo> currencies;
     private List<Double> latlng;
 
-    public Name getName() {
+    public CountryName getName() {
         return name;
     }
 
-    public void setName(Name name) {
+    public void setName(CountryName name) {
         this.name = name;
     }
 
@@ -43,49 +43,5 @@ public class RestCountryResponse {
 
     public void setLatlng(List<Double> latlng) {
         this.latlng = latlng;
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Name {
-        private String common;
-        private String official;
-
-        public String getCommon() {
-            return common;
-        }
-
-        public void setCommon(String common) {
-            this.common = common;
-        }
-
-        public String getOfficial() {
-            return official;
-        }
-
-        public void setOfficial(String official) {
-            this.official = official;
-        }
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class CurrencyInfo {
-        private String name;
-        private String symbol;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getSymbol() {
-            return symbol;
-        }
-
-        public void setSymbol(String symbol) {
-            this.symbol = symbol;
-        }
     }
 }

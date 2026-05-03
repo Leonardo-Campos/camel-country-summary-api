@@ -3,6 +3,7 @@ package com.leonardocampos.camelcountrysummary.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leonardocampos.camelcountrysummary.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.model.api.CurrencyInfo;
 import com.leonardocampos.camelcountrysummary.model.api.RestCountryResponse;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +39,9 @@ public class RestCountriesService {
             summary.setCapital(capitals.get(0));
         }
 
-        Map<String, RestCountryResponse.CurrencyInfo> currencies = country.getCurrencies();
+        Map<String, CurrencyInfo> currencies = country.getCurrencies();
         if (currencies != null && !currencies.isEmpty()) {
-            Map.Entry<String, RestCountryResponse.CurrencyInfo> firstCurrency =
+            Map.Entry<String, CurrencyInfo> firstCurrency =
                     currencies.entrySet().iterator().next();
             summary.setCurrencyCode(firstCurrency.getKey());
             summary.setCurrency(firstCurrency.getValue().getName());
