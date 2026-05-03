@@ -41,8 +41,7 @@ public class MainRoute extends RouteBuilder {
                 .component("servlet")
                 .bindingMode(RestBindingMode.json)
                 .dataFormatProperty("prettyPrint", "true")
-                .contextPath("/api")
-                .apiContextPath("/api-doc");
+                .contextPath("/api");
 
         rest("/country-summary")
                 .description("Country Summary API")
