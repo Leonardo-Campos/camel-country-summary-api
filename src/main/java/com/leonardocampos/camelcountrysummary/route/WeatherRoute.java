@@ -1,7 +1,7 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.processor.WeatherFallbackProcessor;
-import com.leonardocampos.camelcountrysummary.processor.WeatherResponseProcessor;
+import com.leonardocampos.camelcountrysummary.processor.fallback.WeatherFallbackProcessor;
+import com.leonardocampos.camelcountrysummary.processor.response.WeatherResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,6 @@ public class WeatherRoute extends RouteBuilder {
 
         from(DIRECT_FETCH_WEATHER)
                 .routeId("fetch-weather")
-                .log("Fetching weather for lat=${header." + HEADER_LATITUDE + "}, lon=${header." + HEADER_LONGITUDE + "}")
                 .circuitBreaker()
                     .resilience4jConfiguration()
                         .failureRateThreshold(50)
@@ -47,10 +46,9 @@ public class WeatherRoute extends RouteBuilder {
                             + "&lon=${header." + HEADER_LONGITUDE + "}"
                             + "&appid=" + weatherApiKey
                             + "&units=metric"
-                            + "&httpMethod=GET")
+                            + "&bridgeEndpoint=true")
                     .process(weatherProcessor)
                 .onFallback()
-                    .log("Circuit breaker fallback triggered for Weather API")
                     .process(weatherFallbackProcessor)
                 .end();
     }

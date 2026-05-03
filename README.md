@@ -74,12 +74,40 @@ GET /country-summary?name={COUNTRY_NAME}
 
 ## Configuration
 
-Set the following environment variables or update `application.properties`:
+Set the following environment variables locally:
 
 ```bash
 export OPENWEATHERMAP_API_KEY=your-openweathermap-api-key
 export EXCHANGERATE_API_KEY=your-exchangerate-api-key
 ```
+
+On Windows PowerShell:
+
+```powershell
+$env:OPENWEATHERMAP_API_KEY="your-openweathermap-api-key"
+$env:EXCHANGERATE_API_KEY="your-exchangerate-api-key"
+```
+
+To persist them for future terminals on Windows:
+
+```powershell
+[System.Environment]::SetEnvironmentVariable("OPENWEATHERMAP_API_KEY", "your-openweathermap-api-key", "User")
+[System.Environment]::SetEnvironmentVariable("EXCHANGERATE_API_KEY", "your-exchangerate-api-key", "User")
+```
+
+Do not commit real keys to the repository. For GitHub, keep the values in repository secrets:
+
+- `OPENWEATHERMAP_API_KEY`
+- `EXCHANGERATE_API_KEY`
+
+GitHub setup:
+
+1. Open the repository on GitHub.
+2. Go to `Settings > Secrets and variables > Actions`.
+3. Create the secrets `OPENWEATHERMAP_API_KEY` and `EXCHANGERATE_API_KEY`.
+4. Paste the real values there.
+
+The CI workflow already reads these secrets during build execution.
 
 ## Running
 
@@ -125,12 +153,13 @@ curl "http://localhost:8080/api/country-summary?name=Brazil"
       "USD": 0.19,
       "EUR": 0.17,
       "GBP": 0.15,
-      "JPY": 28.5,
-      "BRL": 1.0
+      "JPY": 28.5
     }
   }
 }
 ```
+
+`exchangeRate.baseCurrency` now uses the country's own `currencyCode` as the base currency when querying the exchange API.
 
 ### Error Response (Country Not Found)
 
@@ -172,3 +201,11 @@ curl http://localhost:8080/actuator/health
 - **Resilience4j** (Circuit Breaker)
 - **Jackson** (JSON processing)
 - **Maven** (Build tool)
+
+## CI
+
+The repository includes a GitHub Actions workflow that runs on every push and pull request:
+
+- Maven dependency cache
+- Java 17 setup
+- `mvn clean verify`

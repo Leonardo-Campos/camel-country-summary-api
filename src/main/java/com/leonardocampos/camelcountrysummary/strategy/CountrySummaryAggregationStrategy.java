@@ -1,8 +1,8 @@
 package com.leonardocampos.camelcountrysummary.strategy;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
-import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
-import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
+import com.leonardocampos.camelcountrysummary.domain.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.domain.model.ExchangeRateInfo;
+import com.leonardocampos.camelcountrysummary.domain.model.WeatherInfo;
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
 import org.springframework.stereotype.Component;
@@ -11,6 +11,7 @@ import static com.leonardocampos.camelcountrysummary.config.RouteConstants.*;
 
 @Component
 public class CountrySummaryAggregationStrategy implements AggregationStrategy {
+
 
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {

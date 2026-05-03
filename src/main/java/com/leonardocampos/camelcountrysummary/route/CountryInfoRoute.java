@@ -1,9 +1,9 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.processor.CircuitBreakerFallbackProcessor;
-import com.leonardocampos.camelcountrysummary.processor.CountryNotFoundThrowProcessor;
-import com.leonardocampos.camelcountrysummary.processor.HttpStatusValidationProcessor;
-import com.leonardocampos.camelcountrysummary.processor.RestCountriesResponseProcessor;
+import com.leonardocampos.camelcountrysummary.processor.error.CircuitBreakerFallbackProcessor;
+import com.leonardocampos.camelcountrysummary.processor.error.CountryNotFoundThrowProcessor;
+import com.leonardocampos.camelcountrysummary.processor.error.HttpStatusValidationProcessor;
+import com.leonardocampos.camelcountrysummary.processor.response.RestCountriesResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,6 @@ public class CountryInfoRoute extends RouteBuilder {
 
         from(DIRECT_FETCH_COUNTRY)
                 .routeId("fetch-country-info")
-                .log("Fetching country info for: ${header." + HEADER_COUNTRY_NAME + "}")
                 .circuitBreaker()
                     .resilience4jConfiguration()
                         .failureRateThreshold(50)
@@ -48,11 +47,9 @@ public class CountryInfoRoute extends RouteBuilder {
                     .toD(restCountriesUrl
                             + "/name/${header." + HEADER_COUNTRY_NAME + "}"
                             + "?fields=name,capital,currencies,latlng"
-                            + "&httpMethod=GET"
-                            + "&throwExceptionOnFailureStatusCode=false")
+                            + "&bridgeEndpoint=true")
                     .process(httpStatusValidationProcessor)
                 .onFallback()
-                    .log("Circuit breaker fallback triggered for REST Countries API")
                     .process(new CircuitBreakerFallbackProcessor(503, "Service Unavailable",
                             "The REST Countries API is temporarily unavailable. Please try again later."))
                     .marshal().json()

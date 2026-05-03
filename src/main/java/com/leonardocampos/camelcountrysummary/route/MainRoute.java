@@ -1,9 +1,9 @@
 package com.leonardocampos.camelcountrysummary.route;
 
 import com.leonardocampos.camelcountrysummary.config.RouteConstants;
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
-import com.leonardocampos.camelcountrysummary.processor.CountryNotFoundProcessor;
-import com.leonardocampos.camelcountrysummary.processor.GenericErrorProcessor;
+import com.leonardocampos.camelcountrysummary.domain.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.processor.error.CountryNotFoundProcessor;
+import com.leonardocampos.camelcountrysummary.processor.error.GenericErrorProcessor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.http.base.HttpOperationFailedException;
 import org.apache.camel.model.rest.RestBindingMode;

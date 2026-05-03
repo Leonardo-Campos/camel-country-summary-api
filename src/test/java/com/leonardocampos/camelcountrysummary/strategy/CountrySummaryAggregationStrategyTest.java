@@ -1,8 +1,8 @@
 package com.leonardocampos.camelcountrysummary.strategy;
 
-import com.leonardocampos.camelcountrysummary.model.CountrySummary;
-import com.leonardocampos.camelcountrysummary.model.ExchangeRateInfo;
-import com.leonardocampos.camelcountrysummary.model.WeatherInfo;
+import com.leonardocampos.camelcountrysummary.domain.model.CountrySummary;
+import com.leonardocampos.camelcountrysummary.domain.model.ExchangeRateInfo;
+import com.leonardocampos.camelcountrysummary.domain.model.WeatherInfo;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.junit.jupiter.api.BeforeEach;

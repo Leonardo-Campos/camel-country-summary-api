@@ -1,7 +1,8 @@
 package com.leonardocampos.camelcountrysummary.route;
 
-import com.leonardocampos.camelcountrysummary.processor.ExchangeRateFallbackProcessor;
-import com.leonardocampos.camelcountrysummary.processor.ExchangeRateResponseProcessor;
+import com.leonardocampos.camelcountrysummary.config.ExchangeRateConfig;
+import com.leonardocampos.camelcountrysummary.processor.fallback.ExchangeRateFallbackProcessor;
+import com.leonardocampos.camelcountrysummary.processor.response.ExchangeRateResponseProcessor;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +30,10 @@ public class ExchangeRateRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
+        String supportedCurrencies = String.join(",", ExchangeRateConfig.supportedCurrencies());
 
         from(DIRECT_FETCH_EXCHANGE_RATE)
                 .routeId("fetch-exchange-rate")
-                .log("Fetching exchange rates for currency=${header." + HEADER_CURRENCY_CODE + "}")
                 .circuitBreaker()
                     .resilience4jConfiguration()
                         .failureRateThreshold(50)
@@ -41,15 +42,15 @@ public class ExchangeRateRoute extends RouteBuilder {
                         .minimumNumberOfCalls(3)
                     .end()
                     .setHeader(Exchange.HTTP_METHOD, constant("GET"))
+                    .setHeader("Accept", constant("application/json"))
+                    .setHeader("Accept-Encoding", constant("deflate"))
                     .setBody(constant(null))
                     .toD(exchangeRateUrl
-                            + "/latest?base=${header." + HEADER_CURRENCY_CODE + "}"
-                            + "&symbols=USD,EUR,GBP,JPY,BRL"
-                            + "&access_key=" + exchangeRateApiKey
-                            + "&httpMethod=GET")
+                            + "/live?access_key=" + exchangeRateApiKey
+                            + "&currencies=" + supportedCurrencies
+                            + "&bridgeEndpoint=true")
                     .process(exchangeRateProcessor)
                 .onFallback()
-                    .log("Circuit breaker fallback triggered for Exchange Rate API")
                     .process(exchangeRateFallbackProcessor)
                 .end();
     }
