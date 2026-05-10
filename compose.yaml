@@ -4,11 +4,44 @@ services:
     container_name: camel-country-summary-redis
     ports:
       - "6379:6379"
+      - "13133:13133"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    container_name: camel-country-summary-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.94.0
+    container_name: camel-country-summary-otel-collector
+    command:
+      - --config=/etc/otelcol-contrib/config.yaml
+    depends_on:
+      jaeger:
+        condition: service_healthy
+    volumes:
+      - ./deploy/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4318:4318"
+    healthcheck:
+      test: [ "CMD", "/otelcol-contrib", "--version" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   app:
     build:
@@ -17,10 +50,13 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      otel-collector:
+        condition: service_healthy
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY}
       EXCHANGERATE_API_KEY: ${EXCHANGERATE_API_KEY}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318/v1/traces
     ports:
       - "8080:8080"

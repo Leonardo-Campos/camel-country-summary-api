@@ -1,7 +1,18 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: camel-country-summary-secrets
+  namespace: camel-country-summary
+type: Opaque
+stringData:
+  OPENWEATHERMAP_API_KEY: replace-me
+  EXCHANGERATE_API_KEY: replace-me
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: camel-country-summary
+  namespace: camel-country-summary
   labels:
     app: camel-country-summary
 spec:
@@ -16,10 +27,21 @@ spec:
     spec:
       containers:
         - name: camel-country-summary
-          image: ghcr.io/OWNER/camel-country-summary:latest
+          image: camel-country-summary:local
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           env:
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector:4318/v1/traces
+            - name: CONSOLE_LOG_STRUCTURED_FORMAT
+              value: logstash
+            - name: TRACING_SAMPLING_PROBABILITY
+              value: "1.0"
             - name: OPENWEATHERMAP_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -42,3 +64,17 @@ spec:
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-country-summary
+  namespace: camel-country-summary
+spec:
+  selector:
+    app: camel-country-summary
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP

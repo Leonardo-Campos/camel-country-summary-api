@@ -4,6 +4,8 @@ server:
     context-path: /
 
 spring:
+  application:
+    name: camel-country-summary
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -43,8 +45,14 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
 
 logging:
+  structured:
+    format:
+      console: ${CONSOLE_LOG_STRUCTURED_FORMAT:logstash}
   level:
     org.apache.camel: DEBUG
     org.apache.camel.component.http: DEBUG

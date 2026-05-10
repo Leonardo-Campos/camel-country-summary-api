@@ -139,7 +139,7 @@ docker run -p 8080:8080 \
   camel-country-summary:local
 ```
 
-Run the full stack with Redis:
+Run the full local stack with Redis + tracing:
 
 ```bash
 cp .env.example .env
@@ -147,6 +147,12 @@ docker compose up --build
 ```
 
 The application uses Redis as a cache for the final country summary response. If Redis is unavailable, the API still responds and simply skips cache read/write.
+
+Local endpoints after `docker compose up --build`:
+
+- API: `http://localhost:8080/api/country-summary?name=Brazil`
+- Jaeger dashboard: `http://localhost:16686`
+- OTLP HTTP ingest: `http://localhost:4318/v1/traces`
 
 ## Usage
 
@@ -243,12 +249,43 @@ The repository includes a GitHub Actions workflow that runs on every push and pu
 
 Deployment starter manifests are available in [deploy/k8s](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s):
 
-- [deployment.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/deployment.yaml:1)
-- [service.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/service.yaml:1)
-- [secret-example.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/secret-example.yaml:1)
+- [kustomization.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/kustomization.yaml:1)
+- [app.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/app.yaml:1)
+- [redis.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/redis.yaml:1)
+- [otel-collector.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/otel-collector.yaml:1)
+- [jaeger.yaml](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/jaeger.yaml:1)
+- [README.md](/C:/Users/lopes/IdeaProjects/camel-country-summary-api/deploy/k8s/README.md:1)
 
 Before deploying:
 
-1. Replace `ghcr.io/OWNER/camel-country-summary:latest` with your real image path.
-2. Create the Kubernetes secret from your real API keys.
-3. Apply the manifests to your cluster.
+1. Build the image `camel-country-summary:local` or change the manifest image.
+2. Replace the placeholder secret values in `app.yaml`.
+3. Apply `kubectl apply -k deploy/k8s`.
+
+## Observability
+
+The application now ships with:
+
+- structured JSON logs on console
+- OpenTelemetry trace export over OTLP/HTTP when an exporter endpoint is configured
+- local Kubernetes support with OpenTelemetry Collector + Jaeger
+
+Important configuration:
+
+- `logging.structured.format.console=logstash`
+- `management.tracing.sampling.probability=1.0`
+
+With Docker Compose, tracing is already wired to a local OpenTelemetry Collector and Jaeger UI.
+
+To inspect traces locally:
+
+1. Start the stack with `docker compose up --build`.
+2. Call the API at least once.
+3. Open `http://localhost:16686`.
+4. Select service `camel-country-summary` and search for traces.
+
+Outside Docker, enable OTLP export only when you have a collector running:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
+```
