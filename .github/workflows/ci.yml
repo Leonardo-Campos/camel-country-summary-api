@@ -21,20 +21,13 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - name: Build and run tests
+      - name: Build, test and analyze with SonarCloud
         env:
           OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
           EXCHANGERATE_API_KEY: ${{ secrets.EXCHANGERATE_API_KEY }}
-        run: mvn -B clean verify
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=camel-country-summary
+        run: mvn -B clean verify sonar:sonar -Dsonar.projectKey=camel-country-summary -Dsonar.token=$SONAR_TOKEN
 
   docker-build:
     runs-on: ubuntu-latest
